@@ -11,6 +11,10 @@ INPUTS_DIR = os.path.join(INSTALL_DIR, "inputs")
 MODELS_DIR = os.path.join(INSTALL_DIR, "models")
 SCRIPTS_DIR = os.path.join(INSTALL_DIR, "scripts")
 
+class DataType(Enum):
+    UINT8 = "uint8"
+    INT8 = "int8"
+
 class Plataform(Enum):
     TensorFlowLite = "TFLite"
     EdgeTPU = "EdgeTPU"
@@ -24,6 +28,7 @@ class Operation(Enum):
         return self.value.upper()
     
 def echo_run(*args):
+    '''Executes a system command, prints its output, and returns it as a string.'''
     args_list = list(map(str, args))
     p = subprocess.run(args_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = p.stdout.decode()
@@ -33,11 +38,12 @@ def echo_run(*args):
 def get_path_relative_to_install_dir(full_path):
     return os.path.relpath(full_path, INSTALL_DIR)
 
-def get_model_name(op: Operation, input_shape: Tuple[int], kernel_shape: Tuple[int], platform: Plataform):
+def get_model_name(op: Operation, input_shape: Tuple[int], kernel_shape: Tuple[int], platform: Plataform, data_type: DataType):
     op_name = op.value
     in_shape_str = "_".join(map(str, input_shape))
     kernel_shape_str = "_".join(map(str, kernel_shape))
-    model_name = f"{op_name}_{in_shape_str}_{kernel_shape_str}"
+    data_type_name = data_type.value
+    model_name = f"{op_name}_{in_shape_str}_{kernel_shape_str}_{data_type_name}"
 
     if platform == Plataform.EdgeTPU:
         return f"{model_name}_quant_edgetpu"
@@ -45,6 +51,7 @@ def get_model_name(op: Operation, input_shape: Tuple[int], kernel_shape: Tuple[i
         return model_name
 
 def get_model_filename(model_name, relative_to_install_dir=False):
+    # breakpoint()
     path = get_path_relative_to_install_dir(MODELS_DIR) if relative_to_install_dir else MODELS_DIR
     return os.path.join(path, model_name + ".tflite")
 
