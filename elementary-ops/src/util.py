@@ -38,21 +38,25 @@ def echo_run(*args):
 def get_path_relative_to_install_dir(full_path):
     return os.path.relpath(full_path, INSTALL_DIR)
 
-def get_model_name(op: Operation, input_shape: Tuple[int], kernel_shape: Tuple[int], platform: Plataform, data_type: DataType):
-    op_name = op.value
-    in_shape_str = "_".join(map(str, input_shape))
-    kernel_shape_str = "_".join(map(str, kernel_shape))
-    data_type_name = data_type.value
-    model_name = f"{op_name}_{in_shape_str}_{kernel_shape_str}_{data_type_name}"
+def get_model_name(op: Operation, input_shape: Tuple[int], kernel_shape: Tuple[int], platform: Plataform, data_type: DataType) -> str:
 
-    # TODO new:
-    # model_name = (
-    #     f"{op_map[op]}_"
-    #     f"{data_type.value.lower()}_"
-    #     f"k{kh}x{kw}_"
-    #     f"in{h}x{w}x{c}_"
-    #     f"{platform.value.lower()}"
-    # )
+    # TODO return here and fix when the channel is implemented in both conv2d and depthwise
+    
+    op_name = op.value
+    kh, kw = kernel_shape[0], kernel_shape[1]
+    kc = kernel_shape[2] if len(kernel_shape) > 2 else 1
+    h, w = input_shape[0], input_shape[1]
+    c = input_shape[2] if len(input_shape) > 2 else 1
+    data_type_name = data_type.value.lower()
+    platform_name = platform.value.lower()
+
+    model_name = (
+        f"{op_name}_"
+        f"{data_type_name}_"
+        f"k{kh}x{kw}x{kc}_"
+        f"in{h}x{w}x{c}_"
+        f"{platform_name}"
+    )
 
     if platform == Plataform.EdgeTPU:
         return f"{model_name}_quant_edgetpu"

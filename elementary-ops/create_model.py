@@ -290,27 +290,22 @@ def parse_args() -> (
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument(
-        "-O",
-        "--operation",
-        required=True,
-        help="Operation: DEPTHWISE_CONV_2D | CONV_2D",
-    )
-    parser.add_argument(
-        "-I", "--input-size", required=True, help="Input size (format: H,W or H,W,C)"
-    )
-    parser.add_argument(
-        "-K", "--kernel-size", required=True, help="Kernel size (format: H,W)"
-    )
-    parser.add_argument(
-        "-N", "--kernel-name", default="AVERAGE", help="Kernel name: AVERAGE | ONES"
-    )
-    parser.add_argument(
-        "-P", "--plataform", default="BOTH", help="Plataform: TFLite | EdgeTPU | BOTH"
-    )
-    parser.add_argument(
-        "-D", "--data-type", default="UINT8", help="Data type: UINT8 | INT8"
-    )
+    parser.add_argument('-O', '--operation', required=True,
+                        choices=['CONV_2D', 'DEPTHWISE_CONV_2D'],
+                        help="Type of convolution")
+    parser.add_argument('-D', '--data-type', required=True,
+                        choices=['UINT8', 'INT8'],
+                        help='Data format for quantization')
+    parser.add_argument('-I', '--input-size', required=True, 
+                        help="Input size (format: H,W)")
+    parser.add_argument('-K', '--kernel-size', required=True,
+                        help='Kernel size (format: H,W)')
+    parser.add_argument('-N', '--kernel-name', default="AVERAGE",
+                        choices=['AVERAGE', 'ONES'],
+                        help="Kernel initialization")
+    parser.add_argument('-P', '--plataform', default="EdgeTPU",
+                        choices=['TFLite', 'EdgeTPU', 'BOTH'],
+                        help="Target platform")
     args = parser.parse_args()
 
     op = Operation(args.operation.lower())
