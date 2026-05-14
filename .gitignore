@@ -5,7 +5,6 @@
 *.bmp
 *.npy
 *.log
-schema.fbs
 
 __pycache__
 lib/

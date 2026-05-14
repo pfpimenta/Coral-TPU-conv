@@ -45,13 +45,21 @@ def get_model_name(op: Operation, input_shape: Tuple[int], kernel_shape: Tuple[i
     data_type_name = data_type.value
     model_name = f"{op_name}_{in_shape_str}_{kernel_shape_str}_{data_type_name}"
 
+    # TODO new:
+    # model_name = (
+    #     f"{op_map[op]}_"
+    #     f"{data_type.value.lower()}_"
+    #     f"k{kh}x{kw}_"
+    #     f"in{h}x{w}x{c}_"
+    #     f"{platform.value.lower()}"
+    # )
+
     if platform == Plataform.EdgeTPU:
         return f"{model_name}_quant_edgetpu"
     else:
         return model_name
 
-def get_model_filename(model_name, relative_to_install_dir=False):
-    # breakpoint()
+def get_model_filename(model_name: str, relative_to_install_dir: bool = False) -> str:
     path = get_path_relative_to_install_dir(MODELS_DIR) if relative_to_install_dir else MODELS_DIR
     return os.path.join(path, model_name + ".tflite")
 
@@ -67,12 +75,12 @@ def get_op_from_model_name(model_name: str):
     return operation
 
 def get_dims_from_model_name(model_filename: str):
-    dims =  list(map(int, re.findall("(\d+)[_\.]", model_filename)))
+    dims =  list(map(int, re.findall(r"(\d+)[_\.]", model_filename)))
     input_dims = dims[0:4]
     kernel_dims = dims[4:]
     return input_dims, kernel_dims
 
-def get_plataform_from_model_name(model_name: str):
+def get_plataform_from_model_name(model_name: str) -> Plataform:
     model_name = Path(model_name).stem
     return Plataform.EdgeTPU if model_name.endswith("_edgetpu") else Plataform.TensorFlowLite
 
@@ -83,9 +91,9 @@ def parse_model_name(model_name: str):
     platform = get_plataform_from_model_name(model_name)
     return op, input_shape, kernel_shape, platform
 
-def generate_input_filename(model, ext="bmp", image=None):
+def generate_input_filename(model_name, ext="bmp", image=None):
     out_desc = Path(image).stem if image else "rand"
-    op, input_shape, kernel_shape, _ = parse_model_name(model)
+    op, input_shape, kernel_shape, _ = parse_model_name(model_name)
     dims_str = "_".join(map(str, input_shape + kernel_shape))
     input_name = f"{out_desc}-{op.value}_{dims_str}.{ext}"
     return os.path.join(INPUTS_DIR, input_name)
