@@ -118,69 +118,14 @@ def create_edgetpu_model(
     log.info("Wrote quantized TensorFlow Lite model to %s", quant_model_file)
 
     # Patching the standard TensorFlow Lite model
-    print(f"DEBUG: Current Working Directory is {os.getcwd()}")
     if not Path("schema.fbs").exists():
         log.info("`schema.fbs` was not found, downloading")
         urllib.request.urlretrieve(
-            # "https://github.com/tensorflow/tensorflow/raw/master/tensorflow/lite/schema/schema.fbs",
+            # "https://github.com/tensorflow/tensorflow/raw/master/tensorflow/lite/schema/schema.fbs", # old one. 404 error.
             "https://github.com/PINTO0309/tflite2tensorflow/raw/main/schema/schema.fbs",
             "schema.fbs",
         )
         log.info("Downloaded `schema.fbs`")
-    
-    # schema not found
-    # if not Path("schema.fbs").exists():
-    #     log.info("`schema.fbs` was not found, downloading")
-    #     urllib.request.urlretrieve(
-    #         "https://github.com/tensorflow/tensorflow/raw/master/tensorflow/lite/schema/schema.fbs",
-    #         "schema.fbs")
-    #     log.info("Downloaded `schema.fbs`")
-    # Patching the standard TensorFlow Lite model
-    # wrong schema
-    # print(f"DEBUG: Current Working Directory is {os.getcwd()}")
-    # if not Path("schema.fbs").exists():
-    #     log.info("`schema.fbs` was not found, downloading...")
-    #     # Updated to the current working MLIR compiler path
-    #     url = "https://raw.githubusercontent.com/tensorflow/tensorflow/master/tensorflow/compiler/mlir/lite/schema/schema.fbs"
-    #     try:
-    #         # Adding a header to ensure the request is accepted
-    #         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    #         with urllib.request.urlopen(req) as response, open("schema.fbs", 'wb') as out_file:
-    #             out_file.write(response.read())
-    #         log.info("Downloaded `schema.fbs` successfully.")
-    #     except Exception as e:
-    #         log.error(f"Failed to download schema: {e}")
-    #         raise
-
-    # # almost?
-    # if not Path("schema.fbs").exists():
-    #     log.info("`schema.fbs` was not found, downloading...")
-    #     # Using a stable v2.13.0 schema to ensure compatibility with older flatc versions
-    #     url = "https://raw.githubusercontent.com/tensorflow/tensorflow/v2.13.0/tensorflow/lite/schema/schema.fbs"
-        
-    #     try:
-    #         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    #         with urllib.request.urlopen(req) as response, open("schema.fbs", 'wb') as out_file:
-    #             out_file.write(response.read())
-    #         log.info("Downloaded stable `schema.fbs` successfully.")
-    #     except Exception as e:
-    #         log.error(f"Failed to download schema: {e}")
-    #         raise
-
-    # fudido:
-    # if not Path("schema.fbs").exists():
-    #     log.info("`schema.fbs` was not found, downloading the legacy version...")
-    #     # This is the exact schema from the TF 1.14 release branch
-    #     url = "https://raw.githubusercontent.com/tensorflow/tensorflow/v1.14.0/tensorflow/lite/schema/schema.fbs"
-        
-    #     try:
-    #         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    #         with urllib.request.urlopen(req) as response, open("schema.fbs", 'wb') as out_file:
-    #             out_file.write(response.read())
-    #         log.info("Downloaded legacy compatible schema.fbs successfully.")
-    #     except Exception as e:
-    #         log.error(f"Failed to download schema: {e}")
-    #         raise
 
     log.info("Converting the model from binary flatbuffers to JSON")
     echo_run(
